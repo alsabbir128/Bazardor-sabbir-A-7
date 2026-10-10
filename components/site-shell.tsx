@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { createClient } from '@/lib/supabase/client'
+import { createClient, isSupabaseConfigured } from '@/lib/supabase/client'
 import { Menu, X, UserRound, LogOut } from 'lucide-react'
 import { categories, products, bn } from '@/lib/products'
 
@@ -12,8 +12,16 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [userName, setUserName] = useState('')
   const [currentDate, setCurrentDate] = useState('')
-  async function signOut() { await createClient().auth.signOut(); setUserName('') }
-  useEffect(() => { const supabase = createClient(); supabase.auth.getUser().then(({ data }) => setUserName(String(data.user?.user_metadata?.display_name || data.user?.email?.split('@')[0] || ''))) }, [path])
+  async function signOut() {
+    if (!isSupabaseConfigured()) return
+    await createClient().auth.signOut()
+    setUserName('')
+  }
+  useEffect(() => {
+    if (!isSupabaseConfigured()) return
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setUserName(String(data.user?.user_metadata?.display_name || data.user?.email?.split('@')[0] || '')))
+  }, [path])
   useEffect(() => { setCurrentDate(new Intl.DateTimeFormat('bn-BD', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())) }, [])
   return <div className="min-h-screen bg-[#fafcfa] text-[#1d271f]" dir="ltr">
     <header className="border-b border-[#e8e7df] bg-[#fafaf7]/95 backdrop-blur">
