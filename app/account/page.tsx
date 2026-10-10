@@ -4,33 +4,34 @@ import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { SiteShell } from '@/components/site-shell'
-import { createClient } from '@/lib/supabase/client'
+import { authClient } from '@/lib/auth-client'
 
 export default function AccountPage() {
   const router = useRouter()
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
 
+  const { data: session } = authClient.useSession()
+
   useEffect(() => {
-    const supabase = createClient()
-    supabase.auth.getUser().then(({ data }) => {
-      if (!data.user) {
-        router.replace('/signin')
-        return
-      }
-      setEmail(data.user.email || '')
-      setName(String(data.user.user_metadata?.display_name || data.user.email?.split('@')[0] || 'ব্যবহারকারী'))
-    })
-  }, [router])
+    if (session === null) {
+      router.replace('/signin')
+      return
+    }
+    if (session?.user) {
+      setEmail(session.user.email)
+      setName(session.user.name || session.user.email.split('@')[0] || 'ব্যবহারকারী')
+    }
+  }, [router, session])
 
   async function signOut() {
-    await createClient().auth.signOut()
+    await authClient.signOut()
     router.replace('/')
     router.refresh()
   }
 
   async function updateName() {
-    const { error } = await createClient().auth.updateUser({ data: { display_name: name.trim() || 'ব্যবহারকারী' } })
+    const { error } = await authClient.updateUser({ name: name.trim() || 'ব্যবহারকারী' })
     if (!error) router.refresh()
   }
 

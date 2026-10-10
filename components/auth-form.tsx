@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
+import { authClient } from '@/lib/auth-client'
 
 export function AuthForm({ mode }: { mode: 'signin' | 'signup' }) {
   const router = useRouter()
@@ -24,17 +24,9 @@ export function AuthForm({ mode }: { mode: 'signin' | 'signup' }) {
     if (!email.includes('@') || password.length < 6) { setError('সঠিক ইমেইল এবং অন্তত ৬ অক্ষরের পাসওয়ার্ড দিন।'); setIsSubmitting(false); return }
 
     try {
-      const supabase = createClient()
       const result = isSignIn
-        ? await supabase.auth.signInWithPassword({ email, password })
-        : await supabase.auth.signUp({
-            email,
-            password,
-            options: {
-              data: { display_name: name },
-              emailRedirectTo: `${window.location.origin}/auth/callback`,
-            },
-          })
+        ? await authClient.signIn.email({ email, password })
+        : await authClient.signUp.email({ email, password, name })
       if (result.error) {
         const message = result.error.message.toLowerCase()
         const isUnconfirmed = message.includes('email not confirmed')
