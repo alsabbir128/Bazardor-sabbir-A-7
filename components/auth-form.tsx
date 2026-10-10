@@ -13,7 +13,6 @@ export function AuthForm({ mode }: { mode: 'signin' | 'signup' }) {
   const isSignIn = mode === 'signin'
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    if (event.nativeEvent.isComposing || (event as React.KeyboardEvent).keyCode === 229) return
     setError('')
     setStatus('')
     setIsSubmitting(true)
@@ -28,14 +27,14 @@ export function AuthForm({ mode }: { mode: 'signin' | 'signup' }) {
         ? await authClient.signIn.email({ email, password })
         : await authClient.signUp.email({ email, password, name })
       if (result.error) {
-        const message = result.error.message.toLowerCase()
-        const isUnconfirmed = message.includes('email not confirmed')
+        const message = (result.error.message ?? '').toLowerCase()
         const isRateLimited = message.includes('rate limit') || message.includes('too many')
-        setError(isUnconfirmed ? 'আপনার ইমেইল এখনও নিশ্চিত করা হয়নি। ইমেইল থেকে নিশ্চিত করে আবার চেষ্টা করুন।' : isRateLimited ? 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।' : isSignIn ? 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।' : 'অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।')
+        setError(isRateLimited ? 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।' : isSignIn ? 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।' : 'অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।')
         return
       }
-      if (!isSignIn && !result.data.session) {
-        setStatus('অ্যাকাউন্ট তৈরি হয়েছে। আপনার ইমেইল থেকে নিশ্চিত করে তারপর সাইন ইন করুন।')
+      if (!isSignIn) {
+        setStatus('অ্যাকাউন্ট তৈরি হয়েছে। এখন সাইন ইন করুন।')
+        router.replace('/signin?registered=1')
         return
       }
       router.replace('/account')

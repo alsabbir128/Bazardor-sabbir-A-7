@@ -43,7 +43,8 @@ export async function getProduct(identifier: string) {
 export async function getCategories() {
   const response = await fetch(`${API_BASE}/categories`, { next: { revalidate: 300 } })
   if (!response.ok) throw new Error('Categories API unavailable')
-  const payload = await response.json() as Array<{ id?: string; slug?: string; nameBn?: string; name?: string; icon?: string; categoryIcon?: string }> | { data: Array<{ slug: string; nameBn?: string; name?: string; icon?: string; categoryIcon?: string }> }
+  type CategoryItem = { id?: string; slug?: string; nameBn?: string; name?: string; icon?: string; categoryIcon?: string }
+  const payload = await response.json() as CategoryItem[] | { data: CategoryItem[] }
   const items = Array.isArray(payload) ? payload : payload.data
   return items.map((item) => ({ slug: item.slug || item.id || '', name: item.nameBn || item.name || '', icon: item.icon || item.categoryIcon || '•' }))
 }
