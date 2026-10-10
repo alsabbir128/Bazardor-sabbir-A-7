@@ -32,8 +32,8 @@ export async function getProducts(category?: string) {
   return (Array.isArray(payload) ? payload : payload.data).map(toProduct)
 }
 
-export async function getProduct(identifier: string) {
-  const response = await fetch(`${API_BASE}/products/${encodeURIComponent(identifier)}`, { next: { revalidate: 300 } })
+export async function getProduct(slug: string) {
+  const response = await fetch(`${API_BASE}/products/${encodeURIComponent(slug)}`, { next: { revalidate: 300 } })
   if (!response.ok) return null
   const payload = await response.json() as ApiProduct | { data: ApiProduct }
   const item = 'data' in payload ? payload.data : payload
