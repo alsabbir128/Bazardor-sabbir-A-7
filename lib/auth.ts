@@ -21,11 +21,7 @@ const productionOrigins = [
 
 export const auth = betterAuth({
   database: new Pool({
-    host: process.env.POSTGRES_HOST,
-    port: Number(process.env.POSTGRES_PORT || 5432),
-    user: process.env.POSTGRES_USER,
-    password: process.env.POSTGRES_PASSWORD,
-    database: process.env.POSTGRES_DATABASE,
+    connectionString: process.env.POSTGRES_URL ?? process.env.POSTGRES_PRISMA_URL,
     ssl: { rejectUnauthorized: false },
   }),
   emailAndPassword: {
