@@ -1,3 +1,3 @@
 export default function Loading() {
-  return <main className="mx-auto max-w-5xl space-y-5 px-8 py-12" aria-busy="true" aria-label="লোড হচ্ছে"><div className="h-10 w-64 animate-pulse rounded bg-[#e5ece2]" /><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-32 animate-pulse rounded-lg bg-[#e9efe7]" />)}</div></main>
+  return <main className="mx-auto min-h-[650px] max-w-6xl px-5 py-14" aria-label="লোড হচ্ছে"><div className="h-12 w-2/3 animate-pulse rounded bg-[#e8eee5]" /><div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">{Array.from({ length: 6 }, (_, index) => <div key={index} className="h-44 animate-pulse rounded-2xl bg-[#e8eee5]" />)}</div></main>
 }

@@ -1,11 +1,15 @@
 import Link from 'next/link'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
+import { headers } from 'next/headers'
 import { ArrowLeft, ArrowDown, ArrowUp, Minus } from 'lucide-react'
+import { auth } from '@/lib/auth'
 import { SiteShell } from '@/components/site-shell'
 import { bn, getProduct } from '@/lib/products'
 
 export default async function ProductPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
+  const session = await auth.api.getSession({ headers: await headers() })
+  if (!session?.user) redirect(`/signin?next=/product/${encodeURIComponent(slug)}`)
   const product = await getProduct(slug)
   if (!product) notFound()
 
