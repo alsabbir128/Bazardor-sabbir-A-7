@@ -3,9 +3,8 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
-import { authClient } from '@/lib/auth-client'
+import { createClient } from '@/lib/supabase/client'
 import { Menu, X, UserRound, LogOut } from 'lucide-react'
-import { Toaster, toast } from 'react-hot-toast'
 import { categories, products, bn } from '@/lib/products'
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
@@ -13,17 +12,10 @@ export function SiteShell({ children }: { children: React.ReactNode }) {
   const [open, setOpen] = useState(false)
   const [userName, setUserName] = useState('')
   const [currentDate, setCurrentDate] = useState('')
-  const { data: session } = authClient.useSession()
-  async function signOut() {
-    await authClient.signOut()
-    setUserName('')
-    toast.success('সফলভাবে সাইন আউট হয়েছে।')
-  }
-  useEffect(() => {
-    setUserName(session?.user?.name || session?.user?.email?.split('@')[0] || '')
-  }, [path, session])
+  async function signOut() { await createClient().auth.signOut(); setUserName('') }
+  useEffect(() => { const supabase = createClient(); supabase.auth.getUser().then(({ data }) => setUserName(String(data.user?.user_metadata?.display_name || data.user?.email?.split('@')[0] || ''))) }, [path])
   useEffect(() => { setCurrentDate(new Intl.DateTimeFormat('bn-BD', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())) }, [])
-  return <div className="min-h-screen bg-[#fafcfa] text-[#1d271f]" dir="ltr"><Toaster position="top-center" toastOptions={{ duration: 3000 }} />
+  return <div className="min-h-screen bg-[#fafcfa] text-[#1d271f]" dir="ltr">
     <header className="border-b border-[#e8e7df] bg-[#fafaf7]/95 backdrop-blur">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-8 py-2 lg:px-12">
         <Link href="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>

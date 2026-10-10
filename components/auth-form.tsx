@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { authClient } from '@/lib/auth-client'
+import { createClient } from '@/lib/supabase/client'
 
 export function AuthForm({ mode }: { mode: 'signin' | 'signup' }) {
   const router = useRouter()
@@ -13,6 +13,7 @@ export function AuthForm({ mode }: { mode: 'signin' | 'signup' }) {
   const isSignIn = mode === 'signin'
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault()
+    if (event.nativeEvent.isComposing || (event as React.KeyboardEvent).keyCode === 229) return
     setError('')
     setStatus('')
     setIsSubmitting(true)
@@ -23,18 +24,26 @@ export function AuthForm({ mode }: { mode: 'signin' | 'signup' }) {
     if (!email.includes('@') || password.length < 6) { setError('সঠিক ইমেইল এবং অন্তত ৬ অক্ষরের পাসওয়ার্ড দিন।'); setIsSubmitting(false); return }
 
     try {
+      const supabase = createClient()
       const result = isSignIn
-        ? await authClient.signIn.email({ email, password })
-        : await authClient.signUp.email({ email, password, name })
+        ? await supabase.auth.signInWithPassword({ email, password })
+        : await supabase.auth.signUp({
+            email,
+            password,
+            options: {
+              data: { display_name: name },
+              emailRedirectTo: `${window.location.origin}/auth/callback`,
+            },
+          })
       if (result.error) {
-        const message = (result.error.message ?? '').toLowerCase()
+        const message = result.error.message.toLowerCase()
+        const isUnconfirmed = message.includes('email not confirmed')
         const isRateLimited = message.includes('rate limit') || message.includes('too many')
-        setError(isRateLimited ? 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।' : isSignIn ? 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।' : 'অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।')
+        setError(isUnconfirmed ? 'আপনার ইমেইল এখনও নিশ্চিত করা হয়নি। ইমেইল থেকে নিশ্চিত করে আবার চেষ্টা করুন।' : isRateLimited ? 'অনেকবার চেষ্টা হয়েছে। কিছুক্ষণ পরে আবার চেষ্টা করুন।' : isSignIn ? 'ইমেইল বা পাসওয়ার্ড সঠিক নয়।' : 'অ্যাকাউন্ট তৈরি করা যায়নি। আবার চেষ্টা করুন।')
         return
       }
-      if (!isSignIn) {
-        setStatus('অ্যাকাউন্ট তৈরি হয়েছে। এখন সাইন ইন করুন।')
-        router.replace('/signin?registered=1')
+      if (!isSignIn && !result.data.session) {
+        setStatus('অ্যাকাউন্ট তৈরি হয়েছে। আপনার ইমেইল থেকে নিশ্চিত করে তারপর সাইন ইন করুন।')
         return
       }
       router.replace('/account')
