@@ -16,6 +16,8 @@ export type Product = {
 
 type ApiProduct = { id: number; slug: string; nameBn: string; category: string; categoryNameBn: string; categoryIcon: string; unit: string; image: string; today: number; change?: { pct?: number }; markets?: Market[] }
 const API_BASE = 'https://api.api-store.workers.dev/api/bazardor'
+const categorySlugAliases: Record<string, string> = { sobji: 'shobji', 'dim-dui': 'dudh', mosla: 'moshla' }
+const apiCategorySlug = (slug: string) => Object.entries(categorySlugAliases).find(([, canonical]) => canonical === slug)?.[0] ?? slug
 
 const unitLabel = (unit: string) => unit === 'kg' ? 'প্রতি কেজি' : unit === 'litre' ? 'প্রতি লিটার' : unit === 'piece' ? 'প্রতি পিস' : unit === 'dozen' ? 'প্রতি ডজন' : `প্রতি ${unit}`
 const toProduct = (item: ApiProduct): Product => ({
@@ -25,7 +27,7 @@ const toProduct = (item: ApiProduct): Product => ({
 })
 
 export async function getProducts(category?: string) {
-  const query = category ? `?category=${encodeURIComponent(category)}` : ''
+  const query = category ? `?category=${encodeURIComponent(apiCategorySlug(category))}` : ''
   const response = await fetch(`${API_BASE}/products${query}`, { next: { revalidate: 300 } })
   if (!response.ok) throw new Error('Products API unavailable')
   const payload = await response.json() as ApiProduct[] | { data: ApiProduct[] }
@@ -46,7 +48,10 @@ export async function getCategories() {
   type CategoryItem = { id?: string; slug?: string; nameBn?: string; name?: string; icon?: string; categoryIcon?: string }
   const payload = await response.json() as CategoryItem[] | { data: CategoryItem[] }
   const items = Array.isArray(payload) ? payload : payload.data
-  return items.map((item) => ({ slug: item.slug || item.id || '', name: item.nameBn || item.name || '', icon: item.icon || item.categoryIcon || '•' }))
+  return items.map((item) => {
+    const rawSlug = item.slug || item.id || ''
+    return { slug: categorySlugAliases[rawSlug] ?? rawSlug, name: item.nameBn || item.name || '', icon: item.icon || item.categoryIcon || '•' }
+  })
 }
 
 export const bn = (value: number) => value.toLocaleString('bn-BD')
