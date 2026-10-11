@@ -35,10 +35,6 @@ pnpm install
 pnpm dev
 ```
 
-For local authentication, configure the project environment with:
-
-- `BETTER_AUTH_SECRET` — a random secret with at least 32 characters
-- `POSTGRES_URL` or `POSTGRES_URL_NON_POOLING` — the Supabase Postgres connection string
 
 Existing Supabase Auth accounts are separate from Better Auth accounts. Users migrating to this version need to create a new Better Auth account because Supabase password hashes cannot be imported directly.
 
