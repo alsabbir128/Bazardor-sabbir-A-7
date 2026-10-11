@@ -28,15 +28,6 @@ The dashboard reads from the BazarDor API:
 - `GET /api/bazardor/products?category=chal` — products filtered by category
 - `GET /api/bazardor/products/:id` — one product
 
-## Getting started
-
-```bash
-pnpm install
-pnpm dev
-```
-
-
-Existing Supabase Auth accounts are separate from Better Auth accounts. Users migrating to this version need to create a new Better Auth account because Supabase password hashes cannot be imported directly.
 
 ## Project structure
 
