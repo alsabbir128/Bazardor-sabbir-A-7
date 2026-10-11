@@ -4,14 +4,11 @@
 
 ## Technologies
 
-- Next.js 16 App Router
-- React 19 and TypeScript
-- Tailwind CSS v4
-- Better Auth for email/password authentication
-- Supabase Postgres for Better Auth persistence
-- Drizzle-compatible PostgreSQL connection with `pg`
-- BazarDor REST API for categories and product prices
-- Lucide React icons
+- Next.js -> Build the UI
+- App router(Next.js) + Handle page navigation
+- Tailwind CSS + Styling and responsiveness(DaisyUI, Hero UI)
+- TypeScript
+- BetterAuth
 
 ## Key features
 
