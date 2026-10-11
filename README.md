@@ -9,13 +9,13 @@ A warm, responsive Bengali market-price dashboard for checking everyday product 
 - Lucide icons
 
 ## Features
-1. Bengali-first responsive navigation and price ticker.
+1. Bengali responsive navigation and price ticker.
 2. Hero section with anchor navigation to all products.
 3. Rising and falling price sections with change badges.
 4. Responsive product cards and dynamic product detail pages.
 5. Category pages with sorting controls and friendly invalid-route handling.
 6. Sign-in and sign-up forms with inline validation.
-7. Market-by-market minimum, maximum, and average price summaries.
+7. Market by market minimum, maximum, and average price summaries.
 
 ## Getting started
 
