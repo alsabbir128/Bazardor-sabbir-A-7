@@ -15,7 +15,7 @@ export type Product = {
 }
 
 type ApiProduct = { id: number; slug: string; nameBn: string; category: string; categoryNameBn: string; categoryIcon: string; unit: string; image: string; today: number; change?: { pct?: number }; markets?: Market[] }
-const API_BASE = 'https://api.api-store.workers.dev/api/bazardor'
+export const API_BASE = 'https://api.api-store.workers.dev/api/bazardor'
 
 const unitLabel = (unit: string) => unit === 'kg' ? 'প্রতি কেজি' : unit === 'litre' ? 'প্রতি লিটার' : unit === 'piece' ? 'প্রতি পিস' : unit === 'dozen' ? 'প্রতি ডজন' : `প্রতি ${unit}`
 const toProduct = (item: ApiProduct): Product => ({

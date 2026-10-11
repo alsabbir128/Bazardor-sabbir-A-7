@@ -6,8 +6,9 @@ import { SiteShell } from '@/components/site-shell'
 import { getCategories, getProducts } from '@/lib/products'
 
 export default async function CategoryPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ sort?: string }> }) {
-  const { slug } = await params
+  const { slug: requestedSlug } = await params
   const { sort } = await searchParams
+  const slug = requestedSlug === 'shobji' ? 'sobji' : requestedSlug
   const [categories, products] = await Promise.all([getCategories(), getProducts(slug)])
   const category = categories.find((item) => item.slug === slug)
   if (!category) notFound()

@@ -5,9 +5,9 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 
-export function AuthForm({ mode }: { mode: 'signin' | 'signup' }) {
+export function AuthForm({ mode, initialError = '' }: { mode: 'signin' | 'signup'; initialError?: string }) {
   const router = useRouter()
-  const [error, setError] = useState('')
+  const [error, setError] = useState(initialError)
   const [status, setStatus] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const isSignIn = mode === 'signin'

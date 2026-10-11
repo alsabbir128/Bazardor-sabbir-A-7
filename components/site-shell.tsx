@@ -4,16 +4,29 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { useEffect, useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Menu, X, UserRound, LogOut } from 'lucide-react'
-import { categories, products, bn } from '@/lib/products'
+import { Menu, X, LogOut } from 'lucide-react'
+import { API_BASE, bn, type Product } from '@/lib/products'
 
 export function SiteShell({ children }: { children: React.ReactNode }) {
   const path = usePathname()
   const [open, setOpen] = useState(false)
   const [userName, setUserName] = useState('')
   const [currentDate, setCurrentDate] = useState('')
-  async function signOut() { await createClient().auth.signOut(); setUserName('') }
+  const [categories, setCategories] = useState<{ slug: string; name: string; icon: string }[]>([
+    { slug: 'chal', name: 'চাল', icon: '🍚' },
+    { slug: 'dal', name: 'ডাল', icon: '🫘' },
+    { slug: 'tel', name: 'তেল', icon: '🛢️' },
+    { slug: 'sobji', name: 'সবজি', icon: '🥬' },
+    { slug: 'mach', name: 'মাছ', icon: '🐟' },
+    { slug: 'mangsho', name: 'মাংস', icon: '🍗' },
+    { slug: 'dim-dui', name: 'ডিম-দুধ', icon: '🥛' },
+    { slug: 'mosla', name: 'মসলা', icon: '🌶️' },
+  ])
+  const [products, setProducts] = useState<Product[]>([])
+  async function signOut() { await createClient().auth.signOut(); setUserName(''); routerRefresh() }
+  function routerRefresh() { window.location.reload() }
   useEffect(() => { const supabase = createClient(); supabase.auth.getUser().then(({ data }) => setUserName(String(data.user?.user_metadata?.display_name || data.user?.email?.split('@')[0] || ''))) }, [path])
+  useEffect(() => { let active = true; Promise.all([fetch(`${API_BASE}/categories`).then((response) => response.json()), fetch(`${API_BASE}/products`).then((response) => response.json())]).then(([categoryPayload, productPayload]) => { if (!active) return; const categoryItems = Array.isArray(categoryPayload) ? categoryPayload : categoryPayload.data; const productItems = Array.isArray(productPayload) ? productPayload : productPayload.data; setCategories(categoryItems.map((item: { id?: string; slug?: string; nameBn?: string; icon?: string }) => ({ slug: item.slug || item.id || '', name: item.nameBn || '', icon: item.icon || '•' }))); setProducts(productItems.map((item: { id: number; slug: string; nameBn: string; category: string; categoryNameBn: string; categoryIcon: string; unit: string; image: string; today: number; change?: { pct?: number } }) => ({ id: item.id, slug: item.slug, name: item.nameBn, emoji: item.image || item.categoryIcon, category: item.categoryNameBn, categorySlug: item.category, unit: item.unit, price: item.today, change: item.change?.pct ?? 0, description: '', bazars: [], markets: [] }))); }).catch(() => undefined); return () => { active = false } }, [])
   useEffect(() => { setCurrentDate(new Intl.DateTimeFormat('bn-BD', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }).format(new Date())) }, [])
   return <div className="min-h-screen bg-[#fafcfa] text-[#1d271f]" dir="ltr">
     <header className="border-b border-[#e8e7df] bg-[#fafaf7]/95 backdrop-blur">
