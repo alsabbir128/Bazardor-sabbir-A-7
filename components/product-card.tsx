@@ -8,7 +8,7 @@ export function ProductCard({ product }: { product: Product }) {
   const rising = product.change > 0
   const flat = product.change === 0
   return (
-    <Link href={`/product/${product.id}`} className="group flex min-h-[104px] flex-col rounded-lg border border-[#e5e3dc] bg-white p-3 shadow-[0_3px_10px_rgba(45,52,37,0.03)] transition hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(45,52,37,0.1)]">
+    <Link href={`/product/${product.slug}`} className="group flex min-h-[104px] flex-col rounded-lg border border-[#e5e3dc] bg-white p-3 shadow-[0_3px_10px_rgba(45,52,37,0.03)] transition hover:-translate-y-1 hover:shadow-[0_14px_30px_rgba(45,52,37,0.1)]">
       <div className="flex items-start justify-between">
         <div className="flex size-8 items-center justify-center rounded-md bg-[#f4f1e9] text-lg">{product.emoji}</div>
         <span className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-bold ${flat ? 'bg-[#f2f2ed] text-[#81867b]' : rising ? 'bg-[#e5f5e7] text-[#298542]' : 'bg-[#fff0ed] text-[#d34e42]'}`}>
